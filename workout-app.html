@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#0F0F0F"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="GymPlan"/>
+<meta name="description" content="Your personal PPL Hypertrophy workout tracker"/>
+<title>GymPlan</title>
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22GymPlan%20-%20PPL%20Tracker%22%2C%22short_name%22%3A%22GymPlan%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230F0F0F%22%2C%22theme_color%22%3A%22%230F0F0F%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%2527http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%2527%2520viewBox%3D%270%200%20512%20512%2527%253E%253Crect%2520width%3D%2527512%2527%2520height%3D%2527512%2527%2520fill%3D%2527%25230F0F0F%2527%2520rx%3D%2527100%2527%2F%253E%253Ctext%2520x%3D%2527256%2527%2520y%3D%2527340%2527%2520font-size%3D%2527280%2527%2520text-anchor%3D%2527middle%2527%253E%25F0%259F%2592%25AA%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --red:#E8543A;--blue:#2E86AB;--green:#2D9E5F;--purple:#9B59B6;--orange:#E67E22;
+  --bg:#0F0F0F;--card:#1a1a1a;--card2:#1e1e1e;--border:#2a2a2a;--muted:#555;--sub:#888;--text:#fff
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+/* HEADER */
+.header{background:#111;padding:env(safe-area-inset-top,16px) 16px 0;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px}
+.header-title{font-size:22px;font-weight:900;letter-spacing:-0.5px}
+.header-sub{font-size:11px;color:var(--sub);letter-spacing:2px;text-transform:uppercase}
+.reset-btn{background:#222;border:1px solid var(--border);color:var(--sub);font-size:11px;font-weight:700;padding:6px 12px;border-radius:20px;letter-spacing:0.5px}
+
+/* DAY TABS */
+.tabs{display:flex;overflow-x:auto;scrollbar-width:none;gap:2px;padding:0 4px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;padding:12px 10px 10px;border-bottom:3px solid transparent;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);transition:all 0.15s;min-width:68px;text-align:center}
+.tab.active{color:#fff}
+.tab-day{font-size:8px;margin-bottom:3px}
+
+/* CONTENT */
+.content{max-width:600px;margin:0 auto;padding:16px 14px 80px}
+
+/* DAY HERO */
+.day-hero{border-radius:16px;padding:22px;margin-bottom:18px;position:relative;overflow:hidden}
+.day-hero-emoji{position:absolute;right:-8px;top:-8px;font-size:90px;opacity:0.08;line-height:1}
+.day-hero-eyebrow{font-size:10px;letter-spacing:3px;opacity:0.75;text-transform:uppercase;margin-bottom:4px}
+.day-hero-title{font-size:30px;font-weight:900;letter-spacing:-1px}
+.day-hero-focus{font-size:13px;opacity:0.8;margin-top:3px}
+.day-hero-note{margin-top:14px;background:rgba(0,0,0,0.25);border-radius:10px;padding:10px 13px;font-size:12px;line-height:1.55}
+
+/* PROGRESS */
+.progress-wrap{margin-bottom:18px}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-bottom:7px;font-weight:600}
+.progress-bar{height:6px;background:#222;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width 0.4s ease}
+.progress-complete{text-align:center;padding:10px;font-size:13px;font-weight:700;color:#2D9E5F;letter-spacing:0.5px}
+
+/* SECTION */
+.section{margin-bottom:10px}
+.section-header{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;transition:border-radius 0.15s}
+.section-header.open{border-radius:12px 12px 0 0}
+.section-bar{width:4px;height:20px;border-radius:2px;margin-right:10px;flex-shrink:0}
+.section-name{font-weight:700;font-size:13px;flex:1;text-align:left}
+.section-badge{font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;margin-left:8px;letter-spacing:0.5px}
+.new-badge{background:#2D9E5F;color:#fff}
+.section-count{font-size:11px;color:var(--sub);margin-right:8px}
+.chevron{color:var(--muted);font-size:13px;transition:transform 0.2s}
+.chevron.open{transform:rotate(180deg)}
+
+/* EXERCISE CARD */
+.exercises{background:#161616;border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;overflow:hidden}
+.exercise{padding:14px 14px;border-bottom:1px solid #1e1e1e}
+.exercise:last-child{border-bottom:none}
+.ex-name{font-weight:600;font-size:14px;margin-bottom:8px}
+.ex-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.tag{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500}
+.tag-default{background:#252525;color:#aaa}
+.tag-weight{font-weight:700}
+.ex-tip{margin-top:8px;font-size:11px;color:#F0A500;background:#1f1800;padding:7px 10px;border-radius:8px;line-height:1.45}
+.ex-tip.new-tip{color:#2D9E5F;background:#0d1f12}
+
+/* SET CHECKLIST */
+.set-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.set-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#1e1e1e;border-radius:10px;border:1.5px solid transparent;transition:all 0.18s;cursor:pointer}
+.set-row.done{background:#0d1f0d;border-color:#2D9E5F33}
+.set-check{width:22px;height:22px;border-radius:7px;border:2px solid var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.18s;font-size:13px}
+.set-row.done .set-check{background:#2D9E5F;border-color:#2D9E5F}
+.set-info{flex:1;font-size:12px;color:#aaa;line-height:1.4}
+.set-row.done .set-info{color:#2D9E5F88;text-decoration:line-through}
+.set-label{font-size:11px;font-weight:700;color:var(--sub);min-width:36px}
+.set-row.done .set-label{color:#2D9E5F}
+
+/* REST DAY */
+.rest-screen{text-align:center;padding:50px 20px}
+.rest-emoji{font-size:70px;margin-bottom:16px}
+.rest-title{font-size:20px;font-weight:800;color:#666;margin-bottom:8px}
+.rest-text{font-size:13px;color:var(--muted);line-height:1.7}
+
+/* INSTALL BANNER */
+.install-banner{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid #2a2a5a;border-radius:14px;padding:16px;margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.install-icon{font-size:28px;flex-shrink:0}
+.install-text{flex:1}
+.install-title{font-size:13px;font-weight:700;margin-bottom:2px}
+.install-sub{font-size:11px;color:var(--sub);line-height:1.4}
+.install-btn{background:#2E86AB;color:#fff;font-size:11px;font-weight:800;padding:8px 14px;border-radius:10px;letter-spacing:0.5px;flex-shrink:0}
+.install-close{color:var(--muted);font-size:18px;padding:4px}
+
+/* WEEK OVERVIEW */
+.week-overview{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);margin-top:20px}
+.week-title{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--sub);text-transform:uppercase;margin-bottom:14px}
+.week-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #1e1e1e;cursor:pointer}
+.week-row:last-child{border-bottom:none}
+.week-dot{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.week-info{flex:1}
+.week-name{font-size:13px;font-weight:700}
+.week-focus{font-size:11px;color:var(--sub)}
+.week-prog{font-size:11px;font-weight:700;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-sub">Weekly Program</div>
+      <div class="header-title">💪 GymPlan</div>
+    </div>
+    <button class="reset-btn" onclick="resetDay()">Reset Day</button>
+  </div>
+  <div class="tabs" id="tabs"></div>
+</div>
+
+<div class="content" id="content"></div>
+
+<script>
+const PLAN = [
+  {
+    day:1, label:"Push", focus:"Chest · Shoulders · Triceps", color:"#E8543A",
+    note:"Drive the weight away. Control the lowering phase slowly.",
+    sections:[
+      { name:"Pre-Stretch", exercises:[
+        { name:"Shoulder Rotational — Up & Down", sets:[{info:"15 reps · 2.5 kg"}] },
+        { name:"Shoulder Rotational — Right & Left", sets:[{info:"15 reps · 2.5 kg"}] },
+        { name:"Shoulder Full Open Arm Stretch", sets:[{info:"15 reps · 2.5 kg"}] },
+      ]},
+      { name:"Shoulders", exercises:[
+        { name:"Lateral Raises", sets:[{info:"20 reps · 5 kg"},{info:"25 reps · 5 kg"},{info:"30 reps · 5 kg"}] },
+        { name:"Shoulder Press", sets:[{info:"15 reps · 7.5 kg"},{info:"15 reps · 7.5 kg"},{info:"15 reps · 7.5 kg"}] },
+      ]},
+      { name:"Chest", exercises:[
+        { name:"Bench Chest Fly", sets:[{info:"20 reps · 7.5 kg"},{info:"25 reps · 7.5 kg"},{info:"15 reps · 10 kg"}] },
+        { name:"Bench Press", sets:[{info:"15 reps · 7.5 kg"},{info:"15 reps · 7.5 kg"},{info:"8+8 reps · 10 kg"}] },
+      ]},
+      { name:"Triceps", exercises:[
+        { name:"Skull Crushers", sets:[{info:"15 reps · 5 kg"},{info:"15 reps · 5 kg"},{info:"15 reps · 5 kg"}] },
+        { name:"Tricep Crossover", sets:[{info:"15 reps · 5 kg"},{info:"15 reps · 5 kg"},{info:"15 reps · 5 kg"}] },
+      ]},
+    ]
+  },
+  {
+    day:2, label:"Pull", focus:"Back · Rear Delts · Biceps", color:"#2E86AB",
+    note:"Spine straight and fixed. Don't lean back excessively on pull-overs.",
+    sections:[
+      { name:"Pre-Stretch", exercises:[
+        { name:"Negative Pull-Ups", sets:[{info:"15 reps · Bodyweight"},{info:"15 reps · Bodyweight"},{info:"15 reps · Bodyweight"}] },
+      ]},
+      { name:"Back", exercises:[
+        { name:"Lat Pull-Down", sets:[{info:"15 reps · 50 kg"},{info:"13 reps · 55 kg"},{info:"10+5 reps · 45→40 kg"}] },
+        { name:"V-Bar Pull-Overs", sets:[{info:"20 reps · 27 kg"},{info:"15 reps · 31.5 kg"},{info:"8+8 reps · 36 kg"}], tip:"⚠️ Spine straight and fixed — don't go back!", tipType:"warn" },
+        { name:"Lat Pull-Over", sets:[{info:"20 reps · 15 kg"},{info:"15 reps · 20 kg"},{info:"15 reps · 25 kg"}] },
+      ]},
+      { name:"Rear Delts", exercises:[
+        { name:"Face Pull-Overs", sets:[{info:"20 reps · 20 kg"},{info:"20 reps · 25 kg"},{info:"20 reps · 30 kg"}] },
+      ]},
+      { name:"Biceps", exercises:[
+        { name:"Preacher Curls", sets:[{info:"15 reps · 10 kg"},{info:"15 reps · 10 kg"},{info:"7+7 reps · 10 kg"}] },
+        { name:"Hammer Curls", sets:[{info:"20 reps · 10 kg"},{info:"15 reps · 12.5 kg"},{info:"15 reps · 15 kg"}] },
+      ]},
+    ]
+  },
+  {
+    day:3, label:"Legs", focus:"Quads · Hamstrings · Calves", color:"#2D9E5F",
+    note:"Warm up your knees and hips well. It's tough — do it anyway!",
+    sections:[
+      { name:"Pre-Stretch", exercises:[
+        { name:"Leg Stretch with Step", sets:[{info:"30 sec each leg"}] },
+        { name:"Butterfly Stretch", sets:[{info:"1 min"}] },
+        { name:"L-Shape Stretch", sets:[{info:"15 reps each leg"}] },
+        { name:"Side-to-Side Squats", sets:[{info:"As needed"}] },
+        { name:"Leg Kicks (Front/Side/Back)", sets:[{info:"8 reps each direction"}] },
+        { name:"Heels-Up Squats", sets:[{info:"15 reps"},{info:"15 reps"},{info:"15 reps"}] },
+        { name:"Cycling Machine", sets:[{info:"5 mins · Resistance 10"}] },
+        { name:"Weighted Squats (Warm-up)", sets:[{info:"15 reps · 15 kg"}] },
+      ]},
+      { name:"Compound", exercises:[
+        { name:"Barbell Back Squat", sets:[{info:"15 reps · 15 kg"},{info:"15 reps · 15 kg"},{info:"15 reps · 12.5 kg"}] },
+        { name:"Leg Press Machine", sets:[{info:"15 reps · 80 kg"},{info:"15 reps · 80 kg"},{info:"10+5 reps · 80 kg"}], tip:"It's tough — but do it god damn it!!", tipType:"warn" },
+      ]},
+      { name:"Isolation ✦ NEW", isNew:true, exercises:[
+        { name:"Leg Extensions", sets:[{info:"15 reps · Light"},{info:"15 reps · Moderate"},{info:"12 reps · Moderate"}], tip:"NEW: Targets quads directly. Missing from your original plan.", tipType:"new" },
+        { name:"Hamstring Curls", sets:[{info:"15 reps · Light"},{info:"15 reps · Moderate"},{info:"12 reps · Moderate"}], tip:"NEW: Balances your legs. Critical addition.", tipType:"new" },
+      ]},
+      { name:"Calves", exercises:[
+        { name:"Calf Raises (Machine)", sets:[{info:"15 reps · 70 kg"},{info:"15 reps · 70 kg"},{info:"15 reps · 70 kg"}] },
+      ]},
+      { name:"Post-Stretch", exercises:[
+        { name:"Leg Stretch with Step", sets:[{info:"30 sec each leg"}] },
+        { name:"Butterfly Stretch", sets:[{info:"1 min"}] },
+        { name:"L-Shape Stretch", sets:[{info:"15 reps each leg"}] },
+      ]},
+    ]
+  },
+  { day:4, label:"REST", focus:"Recovery Day", color:"#555", isRest:true,
+    note:"Sleep well, eat enough protein, stay hydrated. Muscles grow during rest." },
+  {
+    day:5, label:"Upper", focus:"Chest · Back · Shoulders (2nd Hit)", color:"#9B59B6",
+    note:"Second stimulus for your upper body. Slightly lower volume — focus on form and feel.",
+    sections:[
+      { name:"Chest", exercises:[
+        { name:"Cable Chest Fly", sets:[{info:"15 reps · 5 kg"},{info:"20 reps · 5 kg"},{info:"8 reps · 10 kg"}] },
+        { name:"Incline Chest Press Machine", sets:[{info:"20 reps · 20 kg"},{info:"15 reps · 25 kg"},{info:"10 reps · 30 kg"}] },
+      ]},
+      { name:"Back", exercises:[
+        { name:"Single Arm Cable Row", sets:[{info:"15 reps · 10 kg"},{info:"15 reps · 10 kg"},{info:"15 reps · 15 kg"}], tip:"OR do Dumbbell Rowing instead — not both.", tipType:"warn" },
+        { name:"Dumbbell Rowing (Alt)", sets:[{info:"20 reps · 12.5 kg"},{info:"20 reps · 17.5 kg"},{info:"20 reps · 20 kg"}] },
+      ]},
+      { name:"Shoulders", exercises:[
+        { name:"Face Pull-Overs", sets:[{info:"20 reps · 20 kg"},{info:"20 reps · 25 kg"},{info:"20 reps · 30 kg"}] },
+        { name:"Lateral Raises", sets:[{info:"20 reps · 5 kg"},{info:"20 reps · 5 kg"}] },
+      ]},
+    ]
+  },
+  {
+    day:6, label:"Legs+Arms", focus:"Legs · Biceps · Triceps (2nd Hit)", color:"#E67E22",
+    note:"Don't skip legs here — this is what makes PPL work. Arms after legs.",
+    sections:[
+      { name:"Legs (2nd Hit)", exercises:[
+        { name:"Barbell Back Squat", sets:[{info:"15 reps · 15 kg"},{info:"15 reps · 15 kg"}] },
+        { name:"Leg Extensions", sets:[{info:"15 reps · Moderate"},{info:"15 reps · Moderate"}] },
+        { name:"Hamstring Curls", sets:[{info:"15 reps · Moderate"},{info:"15 reps · Moderate"}] },
+      ]},
+      { name:"Biceps", exercises:[
+        { name:"Bicep Curls (Incline/Chair)", sets:[{info:"20 reps · 5 kg"},{info:"25 reps · 5 kg"},{info:"30 reps · 2.5 kg"}] },
+        { name:"Preacher Curls", sets:[{info:"15 reps · 10 kg"},{info:"15 reps · 10 kg"}] },
+      ]},
+      { name:"Triceps", exercises:[
+        { name:"Rope Pull-Overs", sets:[{info:"15 reps · 10 kg"},{info:"15 reps · 10 kg"},{info:"15 reps · 10 kg"}] },
+        { name:"Tricep Crossover", sets:[{info:"15 reps · 5 kg"},{info:"15 reps · 5 kg"},{info:"15 reps · 5 kg"}] },
+      ]},
+    ]
+  },
+  { day:7, label:"REST", focus:"Full Rest Day", color:"#555", isRest:true,
+    note:"Full rest. You've earned it. See you next week!" },
+];
+
+// State
+let activeDay = 0;
+let checked = JSON.parse(localStorage.getItem('gymplan_checked') || '{}');
+let openSections = {};
+let showInstall = localStorage.getItem('gymplan_install_dismissed') !== '1';
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+function saveChecked() {
+  localStorage.setItem('gymplan_checked', JSON.stringify(checked));
+}
+
+function toggleSet(key) {
+  checked[key] = !checked[key];
+  saveChecked();
+  render();
+}
+
+function resetDay() {
+  const prefix = `d${activeDay}_`;
+  Object.keys(checked).forEach(k => { if(k.startsWith(prefix)) delete checked[k]; });
+  saveChecked();
+  render();
+}
+
+function toggleSection(key) {
+  openSections[key] = !openSections[key];
+  render();
+}
+
+function getDayProgress(dayIdx) {
+  const plan = PLAN[dayIdx];
+  if(!plan.sections) return {done:0, total:0};
+  let total = 0, done = 0;
+  plan.sections.forEach((sec, si) => {
+    sec.exercises.forEach((ex, ei) => {
+      ex.sets.forEach((_, sti) => {
+        total++;
+        if(checked[`d${dayIdx}_s${si}_e${ei}_st${sti}`]) done++;
+      });
+    });
+  });
+  return {done, total};
+}
+
+function installApp() {
+  if(deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+  }
+}
+
+function dismissInstall() {
+  showInstall = false;
+  localStorage.setItem('gymplan_install_dismissed','1');
+  render();
+}
+
+function render() {
+  renderTabs();
+  renderContent();
+}
+
+function renderTabs() {
+  const plan = PLAN;
+  const colors = plan.map(d => d.color);
+  document.getElementById('tabs').innerHTML = plan.map((d,i) => `
+    <button class="tab ${i===activeDay?'active':''}"
+      style="${i===activeDay?`border-bottom-color:${d.color};color:#fff`:''}"
+      onclick="activeDay=${i};openSections={};render()">
+      <div class="tab-day" style="${i===activeDay?`color:${d.color}`:''}" >DAY ${d.day}</div>
+      ${d.label}
+    </button>
+  `).join('');
+}
+
+function renderContent() {
+  const d = PLAN[activeDay];
+  const {done, total} = getDayProgress(activeDay);
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  let html = '';
+
+  // Install banner
+  if(showInstall) {
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    html += `<div class="install-banner">
+      <div class="install-icon">📲</div>
+      <div class="install-text">
+        <div class="install-title">Add to Home Screen</div>
+        <div class="install-sub">${isIOS
+          ? 'Tap the Share button (□↑) then "Add to Home Screen"'
+          : 'Install this app for quick gym access'
+        }</div>
+      </div>
+      ${!isIOS && deferredPrompt ? `<button class="install-btn" onclick="installApp()">Install</button>` : ''}
+      <button class="install-close" onclick="dismissInstall()">✕</button>
+    </div>`;
+  }
+
+  // Day hero
+  const heroStyle = d.isRest
+    ? 'background:#1a1a1a;border:1px solid #2a2a2a'
+    : `background:${d.color}`;
+  html += `<div class="day-hero" style="${heroStyle}">
+    <div class="day-hero-emoji">${d.isRest?'😴':'💪'}</div>
+    <div class="day-hero-eyebrow">Day ${d.day}</div>
+    <div class="day-hero-title">${d.label}</div>
+    <div class="day-hero-focus">${d.focus}</div>
+    ${d.note ? `<div class="day-hero-note">💡 ${d.note}</div>` : ''}
+  </div>`;
+
+  // Progress bar
+  if(!d.isRest && total > 0) {
+    const allDone = done === total;
+    html += `<div class="progress-wrap">
+      <div class="progress-label">
+        <span>Today's Progress</span>
+        <span style="color:${allDone?'#2D9E5F':'#888'}">${done} / ${total} sets</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${pct}%;background:${d.isRest?'#555':d.color}"></div>
+      </div>
+      ${allDone ? `<div class="progress-complete">🎉 Day complete! Great work!</div>` : ''}
+    </div>`;
+  }
+
+  // Rest day
+  if(d.isRest) {
+    html += `<div class="rest-screen">
+      <div class="rest-emoji">😴</div>
+      <div class="rest-title">Rest & Recover</div>
+      <div class="rest-text">Eat well · Sleep 7–9 hrs · Stay hydrated<br/>Muscles grow when you rest, not during training.</div>
+    </div>`;
+  }
+
+  // Sections
+  if(d.sections) {
+    d.sections.forEach((sec, si) => {
+      const secKey = `sec_${activeDay}_${si}`;
+      const isOpen = openSections[secKey] !== false;
+      const isNew = sec.isNew;
+
+      // Count done in section
+      let sDone=0, sTotal=0;
+      sec.exercises.forEach((ex,ei) => ex.sets.forEach((_,sti) => {
+        sTotal++;
+        if(checked[`d${activeDay}_s${si}_e${ei}_st${sti}`]) sDone++;
+      }));
+
+      html += `<div class="section">
+        <button class="section-header ${isOpen?'open':''}" onclick="toggleSection('${secKey}')">
+          <div class="section-bar" style="background:${isNew?'#2D9E5F':d.isRest?'#555':d.color}"></div>
+          <span class="section-name">${sec.name.replace(' ✦ NEW','')}</span>
+          ${isNew ? `<span class="section-badge new-badge">NEW</span>` : ''}
+          ${sTotal>0 ? `<span class="section-count">${sDone}/${sTotal}</span>` : ''}
+          <span class="chevron ${isOpen?'open':''}">▼</span>
+        </button>`;
+
+      if(isOpen) {
+        html += `<div class="exercises">`;
+        sec.exercises.forEach((ex, ei) => {
+          html += `<div class="exercise">
+            <div class="ex-name">${ex.name}</div>`;
+
+          if(ex.tip) {
+            const tipClass = ex.tipType === 'new' ? 'new-tip' : '';
+            html += `<div class="ex-tip ${tipClass}">${ex.tip}</div>`;
+          }
+
+          html += `<div class="set-list">`;
+          ex.sets.forEach((set, sti) => {
+            const key = `d${activeDay}_s${si}_e${ei}_st${sti}`;
+            const isDone = !!checked[key];
+            html += `<div class="set-row ${isDone?'done':''}" onclick="toggleSet('${key}')">
+              <div class="set-check">${isDone?'✓':''}</div>
+              <div class="set-label">Set ${sti+1}</div>
+              <div class="set-info">${set.info}</div>
+            </div>`;
+          });
+          html += `</div></div>`;
+        });
+        html += `</div>`;
+      }
+      html += `</div>`;
+    });
+  }
+
+  // Week overview (shown on day 1)
+  if(activeDay === 0) {
+    html += `<div class="week-overview">
+      <div class="week-title">Full Week Overview</div>`;
+    PLAN.forEach((wd, wi) => {
+      const {done:wd_done, total:wd_total} = getDayProgress(wi);
+      const prog = wd_total > 0 ? `${wd_done}/${wd_total}` : '';
+      const dotBg = wd.isRest ? '#222' : `${wd.color}22`;
+      const dotBorder = wd.isRest ? '#333' : `${wd.color}55`;
+      const dotColor = wd.isRest ? '#555' : wd.color;
+      html += `<div class="week-row" onclick="activeDay=${wi};openSections={};render()">
+        <div class="week-dot" style="background:${dotBg};border:1.5px solid ${dotBorder};color:${dotColor}">D${wd.day}</div>
+        <div class="week-info">
+          <div class="week-name">${wd.label}</div>
+          <div class="week-focus">${wd.focus}</div>
+        </div>
+        ${prog ? `<div class="week-prog" style="color:${wd_done===wd_total&&wd_total>0?'#2D9E5F':'#555'}">${wd_done===wd_total&&wd_total>0?'✓':prog}</div>` : ''}
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  document.getElementById('content').innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>
