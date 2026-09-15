@@ -1,0 +1,30 @@
+{
+  "name": "MuscleTrack \u2014 Workout Plan",
+  "short_name": "MuscleTrack",
+  "description": "6-day split leg workout plan with tracking",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "index.html",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%232ECC71' width='192' height='192'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='100' fill='%23fff' font-weight='bold'>\ud83d\udcaa</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": [
+    "fitness",
+    "health"
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%230A0A0A' width='540' height='720'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='48' fill='%232ECC71' font-weight='bold'>MuscleTrack</text></svg>",
+      "sizes": "540x720",
+      "form_factor": "narrow"
+    }
+  ]
+}
