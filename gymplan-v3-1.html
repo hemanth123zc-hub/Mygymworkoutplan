@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#0A0A0A"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="GymPlan Pro"/>
+<title>GymPlan Pro</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --red:#FF4D4D;--blue:#3B9EE8;--green:#2ECC71;--purple:#A855F7;--orange:#F97316;
+  --gold:#F59E0B;--pink:#EC4899;--teal:#14B8A6;
+  --bg:#0A0A0A;--card:#141414;--card2:#1C1C1C;--border:#272727;
+  --muted:#555;--sub:#888;--text:#F0F0F0
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea{font-family:inherit}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid var(--border);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom,0px)}
+.bnav-btn{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);transition:color 0.15s}
+.bnav-btn.active{color:var(--green)}
+.bnav-icon{font-size:20px;line-height:1}
+
+/* HEADER */
+.header{background:#111;padding:env(safe-area-inset-top,14px) 16px 0;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px}
+.header-title{font-size:20px;font-weight:900;letter-spacing:-0.5px}
+.header-sub{font-size:10px;color:var(--sub);letter-spacing:2px;text-transform:uppercase}
+.hbtn{background:#1e1e1e;border:1px solid var(--border);color:var(--sub);font-size:11px;font-weight:700;padding:6px 12px;border-radius:20px}
+
+/* TABS */
+.tabs{display:flex;overflow-x:auto;scrollbar-width:none;gap:0;padding:0 2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;padding:11px 8px 9px;border-bottom:3px solid transparent;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);min-width:60px;text-align:center;transition:all 0.15s}
+.tab.active{color:#fff}
+.tab-day{font-size:8px;margin-bottom:2px;font-weight:600}
+
+/* CONTENT */
+.page{display:none;max-width:600px;margin:0 auto;padding:16px 14px 90px}
+.page.active{display:block}
+
+/* DAY HERO */
+.day-hero{border-radius:18px;padding:22px;margin-bottom:16px;position:relative;overflow:hidden}
+.day-hero-bg{position:absolute;right:-10px;top:-10px;font-size:100px;opacity:0.07;line-height:1}
+.day-hero-eyebrow{font-size:9px;letter-spacing:3px;opacity:0.7;text-transform:uppercase;margin-bottom:3px}
+.day-hero-title{font-size:28px;font-weight:900;letter-spacing:-1px}
+.day-hero-day{font-size:13px;opacity:0.75;margin-top:1px;font-weight:600}
+.day-hero-focus{font-size:12px;opacity:0.7;margin-top:2px}
+.day-hero-note{margin-top:12px;background:rgba(0,0,0,0.22);border-radius:10px;padding:9px 12px;font-size:11px;line-height:1.6}
+
+/* NUTRITION CARD */
+.nutrition-card{background:linear-gradient(135deg,#0d1f12,#0a1a0d);border:1px solid #2ECC7133;border-radius:14px;padding:14px;margin-bottom:14px}
+.nutrition-title{font-size:10px;font-weight:800;letter-spacing:2px;color:var(--green);text-transform:uppercase;margin-bottom:10px}
+.nutrition-row{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:12px;color:#ccc;border-bottom:1px solid #1a2a1a}
+.nutrition-row:last-child{border-bottom:none}
+.nutrition-icon{font-size:16px;width:24px;text-align:center;flex-shrink:0}
+
+/* PROGRESS */
+.prog-wrap{margin-bottom:14px}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-bottom:6px;font-weight:600}
+.prog-bar{height:5px;background:#222;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width 0.4s ease}
+.prog-done{text-align:center;padding:8px;font-size:12px;font-weight:700;color:var(--green)}
+
+/* SECTION */
+.section{margin-bottom:10px}
+.sec-hdr{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px 13px;display:flex;align-items:center;justify-content:space-between}
+.sec-hdr.open{border-radius:12px 12px 0 0}
+.sec-bar{width:4px;height:18px;border-radius:2px;margin-right:9px;flex-shrink:0}
+.sec-name{font-weight:700;font-size:13px;flex:1;text-align:left}
+.sec-badge{font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;margin-left:6px;background:var(--green);color:#000}
+.sec-cnt{font-size:11px;color:var(--sub);margin-right:6px}
+.chevron{color:var(--muted);font-size:12px;transition:transform 0.2s}
+.chevron.open{transform:rotate(180deg)}
+
+/* EXERCISE */
+.exercises{background:#0f0f0f;border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;overflow:hidden}
+.exercise{padding:14px;border-bottom:1px solid #1a1a1a}
+.exercise:last-child{border-bottom:none}
+.ex-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.ex-name{font-weight:700;font-size:14px;flex:1}
+.gif-btn{background:#1e1e1e;border:1px solid var(--border);color:var(--gold);font-size:10px;font-weight:800;padding:5px 10px;border-radius:8px;flex-shrink:0}
+.ex-tip{margin-bottom:8px;font-size:11px;padding:7px 10px;border-radius:8px;line-height:1.45}
+.tip-warn{color:#F0A500;background:#1f1800}
+.tip-new{color:var(--green);background:#0d1f12}
+.tip-info{color:var(--blue);background:#0d1520}
+
+/* SET ROWS */
+.set-list{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.set-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#1a1a1a;border-radius:10px;border:1.5px solid transparent;cursor:pointer;transition:all 0.15s}
+.set-row.done{background:#0a1f0d;border-color:#2ECC7133}
+.set-check{width:22px;height:22px;border-radius:7px;border:2px solid var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;transition:all 0.15s}
+.set-row.done .set-check{background:var(--green);border-color:var(--green);color:#000}
+.set-label{font-size:10px;font-weight:800;color:var(--sub);min-width:32px}
+.set-row.done .set-label{color:var(--green)}
+.set-info{flex:1;font-size:12px;color:#aaa}
+.set-row.done .set-info{color:#2ECC7166;text-decoration:line-through}
+.set-log-btn{font-size:10px;color:var(--blue);font-weight:700;padding:3px 7px;background:#0d1a2a;border-radius:6px;flex-shrink:0}
+
+/* LOG INPUTS */
+.log-inputs{display:flex;gap:6px;margin-top:6px;padding:10px;background:#111;border-radius:10px;flex-wrap:wrap;align-items:flex-end}
+.log-field{flex:1;min-width:80px;display:flex;flex-direction:column;gap:3px}
+.log-label{font-size:9px;color:var(--sub);font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.log-input{background:#1e1e1e;border:1px solid var(--border);border-radius:7px;padding:7px 9px;color:#fff;font-size:13px;font-weight:700;width:100%;outline:none}
+.log-input:focus{border-color:var(--blue)}
+.log-save-btn{background:var(--blue);color:#fff;font-size:11px;font-weight:800;padding:9px 16px;border-radius:8px;white-space:nowrap}
+
+/* NOTES */
+.notes-wrap{margin-top:8px}
+.notes-toggle{font-size:11px;color:var(--sub);font-weight:600;display:flex;align-items:center;gap:4px;padding:2px 0}
+.notes-area{width:100%;margin-top:6px;background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:9px;color:#ccc;font-size:12px;line-height:1.5;resize:none;outline:none;min-height:60px}
+.notes-area:focus{border-color:var(--purple)}
+.notes-save{margin-top:5px;background:var(--purple);color:#fff;font-size:11px;font-weight:800;padding:7px 16px;border-radius:8px}
+
+/* REST TIMER */
+.timer-modal{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.timer-box{background:#141414;border:1px solid var(--border);border-radius:24px;padding:28px 24px;text-align:center;width:88%;max-width:340px}
+.timer-title{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--sub);text-transform:uppercase;margin-bottom:16px}
+.timer-ring{width:150px;height:150px;margin:0 auto 20px;position:relative}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring-bg{fill:none;stroke:#222;stroke-width:8}
+.timer-ring-fill{fill:none;stroke:var(--green);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke 0.3s}
+.timer-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.timer-secs{font-size:46px;font-weight:900;letter-spacing:-2px}
+.timer-presets{display:flex;gap:8px;justify-content:center;margin-bottom:18px}
+.timer-preset{background:#1e1e1e;border:1px solid var(--border);color:#aaa;font-size:12px;font-weight:700;padding:7px 14px;border-radius:10px}
+.timer-preset.sel{background:var(--green);color:#000;border-color:var(--green)}
+.timer-btns{display:flex;gap:10px;justify-content:center}
+.timer-btn{padding:11px 22px;border-radius:12px;font-size:13px;font-weight:800}
+.timer-skip{background:#222;color:var(--sub)}
+.timer-stop{background:#FF4D4D18;color:#FF4D4D;border:1px solid #FF4D4D33}
+
+/* GIF MODAL */
+.gif-modal{position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);padding:16px}
+.gif-box{background:#141414;border:1px solid var(--border);border-radius:20px;padding:18px;width:100%;max-width:380px;text-align:center;max-height:90vh;overflow-y:auto}
+.gif-title{font-size:16px;font-weight:800;margin-bottom:3px}
+.gif-sub{font-size:11px;color:var(--sub);margin-bottom:14px}
+.gif-img{width:100%;border-radius:12px;background:#1a1a1a;min-height:180px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:12px}
+.gif-img img{width:100%;border-radius:12px}
+.gif-tips-title{font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--sub);text-transform:uppercase;margin-bottom:8px;text-align:left}
+.gif-tip-item{font-size:12px;color:#ccc;padding:3px 0;line-height:1.5;display:flex;gap:6px;text-align:left}
+.gif-close{margin-top:14px;background:#222;color:#aaa;font-size:12px;font-weight:700;padding:11px 30px;border-radius:12px}
+
+/* HISTORY */
+.hist-header{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--sub);text-transform:uppercase;margin-bottom:14px}
+.hist-ex-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px}
+.hist-ex-name{font-size:14px;font-weight:800;margin-bottom:10px}
+.hist-chart{height:70px;display:flex;align-items:flex-end;gap:4px;margin-bottom:10px}
+.hist-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.hist-bar{width:100%;border-radius:3px 3px 0 0;min-height:4px}
+.hist-bar-date{font-size:8px;color:var(--sub);text-align:center}
+.hist-bar-val{font-size:8px;color:#aaa;text-align:center}
+.hist-log-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #1e1e1e;font-size:12px}
+.hist-log-row:last-child{border-bottom:none}
+.hist-log-date{color:var(--sub);font-size:11px}
+.hist-log-val{font-weight:700;color:var(--green)}
+.hist-empty{text-align:center;padding:50px 20px;color:var(--muted)}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px}
+.stat-val{font-size:30px;font-weight:900;letter-spacing:-1px}
+.stat-label{font-size:10px;color:var(--sub);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.streak-card{background:linear-gradient(135deg,#1a1200,#2a1f00);border:1px solid #F59E0B44;border-radius:14px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:14px}
+.streak-num{font-size:52px;font-weight:900;color:var(--gold);line-height:1}
+
+/* WEEK OVERVIEW */
+.week-card{background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border);margin-top:16px}
+.week-ttl{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--sub);text-transform:uppercase;margin-bottom:12px}
+.week-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #1a1a1a;cursor:pointer}
+.week-row:last-child{border-bottom:none}
+.week-dot{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;text-align:center;line-height:1.2}
+.week-name{font-size:13px;font-weight:700}
+.week-focus{font-size:10px;color:var(--sub)}
+.week-prog{font-size:11px;font-weight:700}
+
+/* REST DAY */
+.rest-screen{text-align:center;padding:36px 20px}
+.rest-tips{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:16px;text-align:left}
+.rest-tip-row{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px solid #1a1a1a;font-size:12px;color:#ccc;line-height:1.5}
+.rest-tip-row:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+
+<div class="header" id="mainHeader">
+  <div class="header-top">
+    <div>
+      <div class="header-sub">5-Day PPL Split</div>
+      <div class="header-title">💪 GymPlan Pro</div>
+    </div>
+    <button class="hbtn" id="resetBtn" onclick="resetDay()">Reset Day</button>
+  </div>
+  <div class="tabs" id="tabs"></div>
+</div>
+
+<div class="page active" id="page-workout"></div>
+<div class="page" id="page-history"></div>
+<div class="page" id="page-stats"></div>
+
+<nav class="bnav">
+  <button class="bnav-btn active" id="nav-workout" onclick="switchPage('workout')"><span class="bnav-icon">🏋️</span>Workout</button>
+  <button class="bnav-btn" id="nav-history" onclick="switchPage('history')"><span class="bnav-icon">📈</span>History</button>
+  <button class="bnav-btn" id="nav-stats" onclick="switchPage('stats')"><span class="bnav-icon">⚡</span>Stats</button>
+</nav>
+
+<!-- TIMER MODAL -->
+<div class="timer-modal" id="timerModal" style="display:none">
+  <div class="timer-box">
+    <div class="timer-title">⏱ Rest Timer</div>
+    <div class="timer-ring">
+      <svg width="150" height="150" viewBox="0 0 150 150">
+        <circle class="timer-ring-bg" cx="75" cy="75" r="63"/>
+        <circle class="timer-ring-fill" id="timerRing" cx="75" cy="75" r="63" stroke-dasharray="396" stroke-dashoffset="0"/>
+      </svg>
+      <div class="timer-center">
+        <div class="timer-secs" id="timerDisplay">60</div>
+        <div style="font-size:10px;color:var(--sub)">seconds</div>
+      </div>
+    </div>
+    <div class="timer-presets">
+      <button class="timer-preset" onclick="setTimerDur(30,this)">30s</button>
+      <button class="timer-preset sel" onclick="setTimerDur(60,this)">60s</button>
+      <button class="timer-preset" onclick="setTimerDur(90,this)">90s</button>
+      <button class="timer-preset" onclick="setTimerDur(120,this)">2m</button>
+    </div>
+    <div class="timer-btns">
+      <button class="timer-btn timer-skip" onclick="closeTimer()">Skip</button>
+      <button class="timer-btn timer-stop" onclick="closeTimer()">✕ Stop</button>
+    </div>
+  </div>
+</div>
+
+<!-- GIF MODAL -->
+<div class="gif-modal" id="gifModal" style="display:none">
+  <div class="gif-box">
+    <div class="gif-title" id="gifTitle"></div>
+    <div class="gif-sub">Exercise Preview & Form Tips</div>
+    <div class="gif-img" id="gifImg"></div>
+    <div id="gifTipsWrap"></div>
+    <button class="gif-close" onclick="closeGif()">✕ Close</button>
+  </div>
+</div>
+
+<script>
+// ── EXERCISE META ─────────────────────────────────────────────────────────
+const META = {
+  "Lateral Raises":{gif:"https://media.giphy.com/media/3o7TKSjRrfIPjeUgJ6/giphy.gif",tips:["Stand straight, slight bend in elbows","Raise arms to shoulder height only — not higher","Control the lowering slowly — 2 seconds down","Exhale as you raise, inhale as you lower","Lead with your elbows, not your hands"]},
+  "Shoulder Press":{gif:"https://media.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif",tips:["Keep core tight and braced throughout","Don't fully lock elbows at the top","Lower to ear level — full range","Press straight up over your head","Avoid arching your lower back"]},
+  "Bench Press":{gif:"https://media.giphy.com/media/3o6fJ6Nf7kIiVFzQIM/giphy.gif",tips:["Feet flat on floor, back slightly arched","Lower bar to your lower chest","Drive through chest — squeeze at top","Elbows at 45° — not flared out","Control the descent — 2-3 seconds down"]},
+  "Bench Chest Fly":{gif:"https://media.giphy.com/media/l0HlQ7LRalQqdWfao/giphy.gif",tips:["Slight permanent bend in elbows","Feel the deep chest stretch at bottom","Squeeze chest hard at the top","Don't go too heavy — feel the muscle","Imagine hugging a big tree"]},
+  "Skull Crushers":{gif:"https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif",tips:["Keep elbows pointed straight at ceiling","Lower bar slowly toward forehead","Don't flare elbows outward","Squeeze triceps fully at the top","Keep upper arms completely still"]},
+  "Tricep Rope Pushdown":{gif:"https://media.giphy.com/media/3o7TKO3AC2o5cPK60g/giphy.gif",tips:["Split the rope at the bottom","Keep elbows pinned to your sides","Lean slightly forward","Full extension — squeeze hard","Slow controlled return"]},
+  "Tricep Crossover":{gif:"https://media.giphy.com/media/3o7TKO3AC2o5cPK60g/giphy.gif",tips:["Elbows pinned to sides throughout","Full extension at bottom","Slow and controlled reps","Lean forward slightly at hips","One of the best tricep isolation moves"]},
+  "Lat Pull-Down":{gif:"https://media.giphy.com/media/xT9IgE6C320MdHNwFW/giphy.gif",tips:["Pull bar to upper chest — not behind neck","Lean back slightly as you pull","Squeeze shoulder blades together at bottom","Control the weight going back up","Think about pulling your elbows to your hips"]},
+  "V-Bar Pull-Overs":{gif:"https://media.giphy.com/media/3o6fJ1BM7R2EBR3Yko/giphy.gif",tips:["SPINE STRAIGHT AND FIXED — most important","Hinge at hips only — not your waist","Pull with your elbows leading","Feel the full lat stretch at top","Don't go back — keep torso locked"]},
+  "Single Arm Cable Row":{gif:"https://media.giphy.com/media/xT9IgGSYkfM9b3KOEM/giphy.gif",tips:["Pull elbow back past your torso","Squeeze shoulder blade at end","Don't rotate your torso","Full stretch at the front","Great for back thickness and detail"]},
+  "Dumbbell Row":{gif:"https://media.giphy.com/media/3o6fJ1BM7R2EBR3Yko/giphy.gif",tips:["Support with opposite hand on bench","Pull to hip — not shoulder","Elbow close to body throughout","Full stretch at the bottom","Control both phases equally"]},
+  "Lat Pull-Over":{gif:"https://media.giphy.com/media/3o7TKtsBMu6xDJDMw8/giphy.gif",tips:["Full overhead stretch is key","Keep slight bend in arms","Engage lats — don't use momentum","Feel the lat working throughout","Great for lat width"]},
+  "Face Pull":{gif:"https://media.giphy.com/media/xT9IgGSYkfM9b3KOEM/giphy.gif",tips:["Pull rope to face level — not chin","External rotate at end (hands go back)","Keep elbows high throughout","Best exercise for rear delts and posture","Light weight — focus on form"]},
+  "Preacher Curls":{gif:"https://media.giphy.com/media/l0HlI9GO4gVDkwpWE/giphy.gif",tips:["Full range — all the way up and down","Don't swing or use momentum","Squeeze hard at the top","Slow negative = more muscle growth","Pad should be in your armpit"]},
+  "Hammer Curls":{gif:"https://media.giphy.com/media/3o6fIW8ZTUGN0PJDBS/giphy.gif",tips:["Neutral grip — thumbs pointing up","Don't swing your body","Can do alternating or together","Hits brachialis and forearms too","Builds arm thickness"]},
+  "Incline Bicep Curl":{gif:"https://media.giphy.com/media/l0HlI9GO4gVDkwpWE/giphy.gif",tips:["Arms fully hang behind your body","Maximum stretch at the bottom","Don't swing — stay controlled","Best exercise for bicep peak","Set bench at 45–60 degree angle"]},
+  "Forearm Wrist Curls":{gif:"https://media.giphy.com/media/3o6fIW8ZTUGN0PJDBS/giphy.gif",tips:["Rest forearms on bench or knees","Full range — curl all the way up","Lower slowly all the way down","Balances your arm development","Also improves grip strength for all lifts"]},
+  "Barbell Back Squat":{gif:"https://media.giphy.com/media/3o6fJ5zy68G7GjlDiE/giphy.gif",tips:["Feet shoulder width, toes slightly out","Break parallel if possible — go deep","Keep chest up and proud","Knees track over toes — don't cave in","Drive through heels on the way up"]},
+  "Leg Press Machine":{gif:"https://media.giphy.com/media/3o7TKtsBMu6xDJDMw8/giphy.gif",tips:["Feet shoulder width, mid plate","Don't lock knees at the top","Control the descent — 3 seconds","It's tough — but DO IT","Push through heels — not toes"]},
+  "Leg Extensions":{gif:"https://media.giphy.com/media/xT9IgE6C320MdHNwFW/giphy.gif",tips:["Full extension at the top","Hold 1 second at peak contraction","Control the lowering slowly","Best quad isolation exercise","Toes slightly inward for inner quad"]},
+  "Hamstring Curls":{gif:"https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif",tips:["Full range of motion is essential","Don't let hips rise off pad","Squeeze hamstrings hard at top","Slow negative phase for growth","Point toes slightly for more activation"]},
+  "Romanian Deadlift":{gif:"https://media.giphy.com/media/3o6fJ5zy68G7GjlDiE/giphy.gif",tips:["Hinge at hips — not your waist","Feel the hamstring stretch deeply","Keep bar close to your legs","Back straight throughout — never round","This is the KING of hamstring exercises"]},
+  "Calf Raises (Machine)":{gif:"https://media.giphy.com/media/3o6fIW8ZTUGN0PJDBS/giphy.gif",tips:["Full stretch at the bottom — pause","Hold peak contraction 1 second","Don't bounce — full range only","Slow and controlled always","Try toes in and out for different heads"]},
+  "Hip Thrust":{gif:"https://media.giphy.com/media/3o7TKtsBMu6xDJDMw8/giphy.gif",tips:["Back on bench at shoulder blade level","Drive hips up — squeeze glutes HARD","Full extension at the top","Don't hyperextend your lower back","Glutes are essential for squat strength"]},
+  "Neck Flexion":{gif:"https://media.giphy.com/media/3o6fJ5zy68G7GjlDiE/giphy.gif",tips:["Lie on bench, head off the edge","Curl chin slowly to your chest","Control all the way back down","Start with bodyweight only","Builds front neck thickness"]},
+  "Neck Extension":{gif:"https://media.giphy.com/media/3o6fJ5zy68G7GjlDiE/giphy.gif",tips:["Lie face down, head off edge","Raise head up and back slowly","Full range — feel the stretch","Builds posterior neck strength","Start with bodyweight always"]},
+  "Lateral Neck Flexion":{gif:"https://media.giphy.com/media/3o6fJ5zy68G7GjlDiE/giphy.gif",tips:["Sit upright, spine straight","Tilt ear toward shoulder","Apply gentle resistance with your hand","Equal reps each side","Builds side neck — trap connection"]},
+  "Shrugs":{gif:"https://media.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif",tips:["Shrug straight up — not forward","Hold at top for 1 second","Full drop at bottom","Don't roll shoulders — straight up","Heavy weight for trap growth"]},
+  "Cable Chest Fly":{gif:"https://media.giphy.com/media/l0HlQ7LRalQqdWfao/giphy.gif",tips:["Meet hands in front of chest","Keep slight bend in elbows always","Feel the deep chest stretch","One of the best chest exercises","Squeeze hard at the midpoint"]},
+  "Incline Chest Press Machine":{gif:"https://media.giphy.com/media/3o6fJ6Nf7kIiVFzQIM/giphy.gif",tips:["Targets upper chest specifically","Keep back flat on pad","Full range of motion","Squeeze chest at top","Upper chest creates the shelf look"]},
+  "Dead Hang":{gif:"https://media.giphy.com/media/3o6fJ5zy68G7GjlDiE/giphy.gif",tips:["Hang from bar — fully relaxed","Let shoulders open and decompress","Builds grip strength passively","Stretches the entire spine","Great pre-pull-day warm-up"]},
+  "Negative Pull-Ups":{gif:"https://media.giphy.com/media/3o6fJ5zy68G7GjlDiE/giphy.gif",tips:["Jump to top position","Lower VERY slowly — 4-5 seconds","Full arm extension at bottom","This builds pull-up strength fast","3 second hold at midpoint"]},
+};
+
+// ── PLAN DATA ─────────────────────────────────────────────────────────────
+const PLAN = [
+  {
+    day:"Monday", label:"Push", focus:"Chest · Shoulders · Triceps", color:"#FF4D4D", emoji:"🔴",
+    note:"Drive the weight away from your body. Control the lowering phase — 2-3 seconds down. Focus on feeling the muscle, not just moving the weight.",
+    nutrition:{timing:"45–60 min before gym",items:["🌱 Chia seed drink (500ml) — done ✅","🍋 Lemon + pink salt crystals — done ✅","🌴 3 dates — eat 30 min before gym","🥚 Post-workout: 3–4 eggs + 1 banana within 45 min after"]},
+    sections:[
+      {name:"Pre-Stretch (5 mins)",exercises:[
+        {name:"Shoulder Circles",sets:[{info:"10 forward · 10 backward — slow"}],noLog:true},
+        {name:"Arm Cross Stretch",sets:[{info:"15 reps each arm — feel the stretch"}],noLog:true},
+        {name:"Wall Chest Opener",sets:[{info:"Hold 20 sec each side — open the chest"}],noLog:true},
+        {name:"Wrist Rotations",sets:[{info:"15 each direction — protect your joints"}],noLog:true},
+        {name:"Band Pull-Apart",sets:[{info:"2 sets · 15 reps — activates rear delts"}],noLog:true},
+      ]},
+      {name:"Shoulders",exercises:[
+        {name:"Lateral Raises",sets:[{info:"12 reps · 5 kg"},{info:"15 reps · 5 kg"},{info:"15 reps · 5 kg"},{info:"12 reps · 5→2.5 kg drop"}]},
+        {name:"Shoulder Press",sets:[{info:"12 reps · 7.5 kg"},{info:"10 reps · 10 kg"},{info:"10 reps · 10 kg"},{info:"8 reps · 10 kg"}]},
+      ]},
+      {name:"Chest",exercises:[
+        {name:"Bench Press",sets:[{info:"12 reps · 7.5 kg"},{info:"10 reps · 10 kg"},{info:"8 reps · 10 kg"},{info:"8 reps · 10 kg"}]},
+        {name:"Bench Chest Fly",sets:[{info:"15 reps · 7.5 kg"},{info:"12 reps · 7.5 kg"},{info:"10 reps · 10 kg"}]},
+      ]},
+      {name:"Triceps",exercises:[
+        {name:"Skull Crushers",sets:[{info:"12 reps · 5 kg"},{info:"12 reps · 5 kg"},{info:"10 reps · 5 kg"}]},
+        {name:"Tricep Rope Pushdown",sets:[{info:"15 reps · 10 kg"},{info:"15 reps · 10 kg"},{info:"12 reps · 12.5 kg"}]},
+      ]},
+    ]
+  },
+  {
+    day:"Tuesday", label:"Pull", focus:"Back · Rear Delts · Biceps", color:"#3B9EE8", emoji:"🔵",
+    note:"Pull with your elbows, not your hands. Spine straight on all rows. Every rep should feel like you're trying to crack a walnut between your shoulder blades.",
+    nutrition:{timing:"45–60 min before gym",items:["🌱 Chia seed drink (500ml) ✅","🌴 3 dates — 30 min before","🥩 Post-workout: chicken/paneer + rice within 45 min","💧 Carry 500ml water to gym — sip between sets"]},
+    sections:[
+      {name:"Pre-Stretch (5 mins)",exercises:[
+        {name:"Dead Hang",sets:[{info:"20–30 sec hold · 2–3 sets — decompresses spine"}],noLog:true},
+        {name:"Cat-Cow Spine Stretch",sets:[{info:"10 slow reps — warms up the whole back"}],noLog:true},
+        {name:"Child's Pose",sets:[{info:"Hold 30 sec — opens lats and shoulders"}],noLog:true},
+        {name:"Neck Rolls",sets:[{info:"5 slow rolls each direction"}],noLog:true},
+      ]},
+      {name:"Back",exercises:[
+        {name:"Lat Pull-Down",sets:[{info:"12 reps · 50 kg"},{info:"10 reps · 55 kg"},{info:"10 reps · 55 kg"},{info:"8 reps · 60 kg"}]},
+        {name:"V-Bar Pull-Overs",sets:[{info:"15 reps · 27 kg"},{info:"12 reps · 31.5 kg"},{info:"10 reps · 36 kg"}],tip:"⚠️ Spine straight and FIXED — never round your back",tipType:"warn"},
+        {name:"Single Arm Cable Row",sets:[{info:"12 reps · 10 kg each side"},{info:"12 reps · 12.5 kg"},{info:"10 reps · 15 kg"}]},
+        {name:"Lat Pull-Over",sets:[{info:"15 reps · 15 kg"},{info:"12 reps · 20 kg"},{info:"12 reps · 20 kg"}]},
+      ]},
+      {name:"Rear Delts",exercises:[
+        {name:"Face Pull",sets:[{info:"15 reps · 20 kg"},{info:"15 reps · 25 kg"},{info:"15 reps · 25 kg"}],tip:"💡 Best exercise for posture and shoulder health — never skip this",tipType:"info"},
+      ]},
+      {name:"Biceps",exercises:[
+        {name:"Preacher Curls",sets:[{info:"12 reps · 10 kg"},{info:"10 reps · 10 kg"},{info:"10 reps · 10 kg"}]},
+        {name:"Hammer Curls",sets:[{info:"15 reps · 10 kg"},{info:"12 reps · 12.5 kg"},{info:"12 reps · 12.5 kg"}]},
+      ]},
+    ]
+  },
+  {
+    day:"Wednesday", label:"REST", focus:"Full Recovery Day", color:"#555", emoji:"⚪", isRest:true,
+    note:"This rest day is NOT optional. Your muscles are rebuilding today. Sleep 7–9 hours, hit your protein target, and drink 3.5 litres of water.",
+    restTips:[
+      {icon:"😴",text:"Sleep 7–9 hours — this is when muscle protein synthesis peaks"},
+      {icon:"🥩",text:"Still hit 80–100g protein today — muscles rebuild on rest days too"},
+      {icon:"💧",text:"3.5 litres of water today — flushes lactate from muscles"},
+      {icon:"🚶",text:"Light 20-min walk is fine — keeps blood flowing to sore muscles"},
+      {icon:"🧘",text:"Try 10 min of full body stretching — speeds up recovery significantly"},
+      {icon:"🫙",text:"Your chia drink is still great today — the omega-3 reduces muscle inflammation"},
+    ]
+  },
+  {
+    day:"Thursday", label:"Face & Neck", focus:"Face · Neck · Jaw · Shrugs", color:"#EC4899", emoji:"🩷",
+    note:"Consistency here matters more than intensity. Light resistance, full range, slow reps. Mew throughout the entire session and rest of the day.",
+    nutrition:{timing:"Before session",items:["🌱 Chia seed drink ✅","🌴 2–3 dates","🧊 Ice massage on face after session — reduces puffiness","🚫 Avoid high sodium food today — causes face bloating"]},
+    sections:[
+      {name:"Warm-Up (5 mins)",exercises:[
+        {name:"Neck Circles",sets:[{info:"10 slow circles each direction"}],noLog:true},
+        {name:"Chin Tucks",sets:[{info:"15 reps — chin straight back, not down"}],noLog:true},
+        {name:"Jaw Stretch",sets:[{info:"Open wide, hold 5 sec — 10 reps"}],noLog:true},
+        {name:"Shoulder Shrugs",sets:[{info:"15 reps — releases neck tension"}],noLog:true},
+      ]},
+      {name:"Neck Training",exercises:[
+        {name:"Neck Flexion",sets:[{info:"15 reps · Bodyweight"},{info:"15 reps · Bodyweight"},{info:"15 reps · Bodyweight"}],tip:"💡 Lie on bench, head off edge. Curl chin to chest slowly. Builds front neck thickness.",tipType:"info"},
+        {name:"Neck Extension",sets:[{info:"15 reps · Bodyweight"},{info:"15 reps · Bodyweight"},{info:"15 reps · Bodyweight"}],tip:"💡 Lie face down, head off edge. Raise head up slowly. Builds posterior neck.",tipType:"info"},
+        {name:"Lateral Neck Flexion",sets:[{info:"15 reps · Each side"},{info:"15 reps · Each side"},{info:"15 reps · Each side"}],tip:"💡 Apply hand resistance. Equal work each side. Builds side neck definition.",tipType:"info"},
+      ]},
+      {name:"Traps (Neck-Shoulder Connection)",exercises:[
+        {name:"Shrugs",sets:[{info:"20 reps · 15 kg"},{info:"20 reps · 17.5 kg"},{info:"15 reps · 20 kg"},{info:"15 reps · 20 kg"}],tip:"💡 Thick traps make your neck look powerful. Shrug straight up — hold 1 second.",tipType:"info"},
+      ]},
+      {name:"Face Exercises",exercises:[
+        {name:"Jaw Clenching",sets:[{info:"Clench 5 sec, release · 20 reps"},{info:"Clench 5 sec, release · 20 reps"},{info:"Clench 5 sec, release · 20 reps"}],tip:"💡 Builds masseter muscle — sharpens jawline definition",tipType:"new",noLog:true},
+        {name:"Chin-Up Stretch",sets:[{info:"Tilt head back, push jaw forward · Hold 10 sec · 12 reps"},{info:"12 reps"},{info:"12 reps"}],tip:"💡 Tightens under-chin area — reduces double chin appearance",tipType:"new",noLog:true},
+        {name:"Cheek Sculpting",sets:[{info:"Fish face hold 10 sec · 15 reps"},{info:"Cheek puff hold 10 sec · 15 reps"},{info:"Wide smile hold 10 sec · 15 reps"}],tip:"💡 Targets mid-face muscles — adds definition to cheekbones",tipType:"new",noLog:true},
+        {name:"Tongue-to-Ceiling",sets:[{info:"Head back, tongue to roof · Hold 20 sec"},{info:"Hold 20 sec"},{info:"Hold 20 sec"}],tip:"💡 Best exercise for tightening the platysma under your chin",tipType:"new",noLog:true},
+      ]},
+      {name:"Daily Habits (Not just Thursday)",exercises:[
+        {name:"Mewing",sets:[{info:"ALL DAY — tongue pressed to roof of mouth"}],tip:"💡 The single most powerful jaw and face restructuring technique. Free. Consistent. Results in 3–6 months.",tipType:"info",noLog:true},
+        {name:"Mastic Gum Chewing",sets:[{info:"20–30 mins daily — one piece"}],tip:"💡 Builds masseter (jaw muscle) like a gym exercise. Best jawline supplement you can buy.",tipType:"info",noLog:true},
+      ]},
+    ]
+  },
+  {
+    day:"Friday", label:"Upper", focus:"Chest · Back · Shoulders — 2nd Hit", color:"#A855F7", emoji:"🟣",
+    note:"Second stimulus for the whole upper body. Slightly lower volume — focus purely on the muscle contraction. Mind-muscle connection is everything today.",
+    nutrition:{timing:"Before gym",items:["🌱 Chia seed drink ✅","🌴 3 dates","🥛 Post-workout: curd (200g) + banana — great for muscle recovery","💧 500ml water during workout"]},
+    sections:[
+      {name:"Pre-Stretch (5 mins)",exercises:[
+        {name:"Shoulder Dislocates",sets:[{info:"10 slow reps with band or towel — full rotation"}],noLog:true},
+        {name:"Thoracic Spine Rotation",sets:[{info:"10 reps each side — loosens the upper back"}],noLog:true},
+        {name:"Arm Swings",sets:[{info:"20 forward + 20 cross — warms shoulders"}],noLog:true},
+        {name:"Band Pull-Apart",sets:[{info:"2 sets · 15 reps — activates rear delts"}],noLog:true},
+      ]},
+      {name:"Chest (2nd Hit)",exercises:[
+        {name:"Incline Chest Press Machine",sets:[{info:"15 reps · 20 kg"},{info:"12 reps · 25 kg"},{info:"10 reps · 30 kg"},{info:"8 reps · 30 kg"}]},
+        {name:"Cable Chest Fly",sets:[{info:"15 reps · 5 kg"},{info:"12 reps · 7.5 kg"},{info:"10 reps · 10 kg"}]},
+      ]},
+      {name:"Back (2nd Hit)",exercises:[
+        {name:"Lat Pull-Over",sets:[{info:"15 reps · 15 kg"},{info:"12 reps · 20 kg"},{info:"12 reps · 25 kg"}]},
+        {name:"Dumbbell Row",sets:[{info:"12 reps · 12.5 kg each"},{info:"12 reps · 17.5 kg"},{info:"10 reps · 20 kg"}]},
+      ]},
+      {name:"Shoulders (2nd Hit)",exercises:[
+        {name:"Face Pull",sets:[{info:"15 reps · 20 kg"},{info:"15 reps · 25 kg"},{info:"15 reps · 25 kg"}]},
+        {name:"Lateral Raises",sets:[{info:"15 reps · 5 kg"},{info:"15 reps · 5 kg"},{info:"12 reps · 5 kg"}],tip:"💡 Lighter today — focus on the burn and the squeeze, not the weight",tipType:"info"},
+      ]},
+    ]
+  },
+  {
+    day:"Saturday", label:"LEGS 💥", focus:"Full Power Leg Day — Maximum Time", color:"#2ECC71", emoji:"🟢",
+    note:"Your biggest day. You have maximum time. Every set matters. Romanian Deadlift and Hip Thrust are NEW — they will transform your legs and glutes completely.",
+    nutrition:{timing:"Before gym",items:["🌱 Chia seed drink ✅","🌴 3 dates + 1 banana today (extra carbs for leg day)","🥚 Post-workout: rice + eggs + dal — biggest post-gym meal of the week","💧 Drink 750ml water during this session — leg day sweats the most"]},
+    sections:[
+      {name:"Pre-Stretch (10 mins — Full)",exercises:[
+        {name:"Leg Stretch with Step",sets:[{info:"30 sec each leg · 2 rounds"}],noLog:true},
+        {name:"Butterfly Stretch",sets:[{info:"1 min — press knees down gently"}],noLog:true},
+        {name:"L-Shape Stretch",sets:[{info:"15 reps each leg"}],noLog:true},
+        {name:"Side-to-Side Squats",sets:[{info:"10 reps each side — slow"}],noLog:true},
+        {name:"Leg Kicks Front/Side/Back",sets:[{info:"10 reps each direction each leg"}],noLog:true},
+        {name:"Hip Circles",sets:[{info:"10 each direction — opens hip joint"}],noLog:true},
+        {name:"Glute Bridges (Warm-up)",sets:[{info:"20 reps · Bodyweight — activates glutes before squats"}],noLog:true},
+        {name:"Walking Lunges (Warm-up)",sets:[{info:"20 steps — prepares knees and hips"}],noLog:true},
+        {name:"Heels-Up Squats",sets:[{info:"15 reps · Bodyweight — 3 sets"}],noLog:true},
+        {name:"Weighted Squats (Warm-up)",sets:[{info:"15 reps · 15 kg — before going heavy"}],noLog:true},
+      ]},
+      {name:"Compound Power",exercises:[
+        {name:"Barbell Back Squat",sets:[{info:"15 reps · 15 kg"},{info:"12 reps · 20 kg"},{info:"10 reps · 22.5 kg"},{info:"8 reps · 25 kg"}],tip:"💡 Progressive overload — add weight each set. King of all leg exercises.",tipType:"info"},
+        {name:"Leg Press Machine",sets:[{info:"15 reps · 80 kg"},{info:"12 reps · 90 kg"},{info:"10 reps · 100 kg"},{info:"10 reps · 100 kg"}],tip:"⚡ It's tough — do it god damn it!! This is where the gains are.",tipType:"warn"},
+        {name:"Romanian Deadlift",sets:[{info:"12 reps · 20 kg"},{info:"10 reps · 25 kg"},{info:"10 reps · 25 kg"}],tip:"🆕 NEW — King of hamstring exercises. Hinge at hips, feel the deep stretch. Back STRAIGHT always.",tipType:"new"},
+      ]},
+      {name:"Isolation",exercises:[
+        {name:"Leg Extensions",sets:[{info:"15 reps · Moderate"},{info:"15 reps · Moderate"},{info:"12 reps · Moderate"},{info:"10 reps · Heavier"}],tip:"🆕 NEW — Best quad isolation. Full extension, hold 1 second at top.",tipType:"new"},
+        {name:"Hamstring Curls",sets:[{info:"15 reps · Moderate"},{info:"15 reps · Moderate"},{info:"12 reps · Moderate"},{info:"10 reps · Heavier"}],tip:"🆕 NEW — Balances your quad work. Slow negative for maximum growth.",tipType:"new"},
+      ]},
+      {name:"Glutes",exercises:[
+        {name:"Hip Thrust",sets:[{info:"15 reps · Bodyweight"},{info:"15 reps · 20 kg"},{info:"15 reps · 20 kg"}],tip:"🆕 NEW — Glutes tie everything together. Squeeze HARD at the top. Transforms your lower body.",tipType:"new"},
+      ]},
+      {name:"Calves",exercises:[
+        {name:"Calf Raises (Machine)",sets:[{info:"20 reps · 70 kg"},{info:"20 reps · 70 kg"},{info:"15 reps · 75 kg"},{info:"15 reps · 75 kg"}],tip:"💡 Full stretch at bottom, hold at top. Calves respond to high reps.",tipType:"info"},
+      ]},
+      {name:"Post-Stretch (5 mins — Always)",exercises:[
+        {name:"Leg Stretch with Step",sets:[{info:"30 sec each leg"}],noLog:true},
+        {name:"Butterfly Stretch",sets:[{info:"1 min"}],noLog:true},
+        {name:"L-Shape Stretch",sets:[{info:"15 reps each leg"}],noLog:true},
+        {name:"Quad Stretch Standing",sets:[{info:"30 sec each leg"}],noLog:true},
+      ]},
+    ]
+  },
+  {
+    day:"Sunday", label:"REST", focus:"Full Rest — See You Monday", color:"#555", emoji:"⚪", isRest:true,
+    note:"Full rest. You've completed a full week. Your body is rebuilding everything today. Eat well and sleep long.",
+    restTips:[
+      {icon:"🏆",text:"You completed a full week — that's more than most people ever do"},
+      {icon:"😴",text:"Sleep as long as you can — Saturday's leg session needs maximum recovery"},
+      {icon:"🥩",text:"High protein today — your legs are rebuilding all day Sunday"},
+      {icon:"💧",text:"3.5 litres water — flushes the muscle breakdown from leg day"},
+      {icon:"🌱",text:"Still have your chia drink today — omega-3 reduces the soreness"},
+      {icon:"📱",text:"Review this week's logged weights and set goals for next week"},
+    ]
+  }
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let activeDay = 0;
+let currentPage = 'workout';
+let checked = JSON.parse(localStorage.getItem('gp3_checked')||'{}');
+let logs = JSON.parse(localStorage.getItem('gp3_logs')||'{}');
+let notes = JSON.parse(localStorage.getItem('gp3_notes')||'{}');
+let openSections = {};
+let openNotes = {};
+let openLogs = {};
+let timerInterval = null;
+let timerTotal = 60;
+let timerLeft = 60;
+
+function save(){
+  localStorage.setItem('gp3_checked',JSON.stringify(checked));
+  localStorage.setItem('gp3_logs',JSON.stringify(logs));
+  localStorage.setItem('gp3_notes',JSON.stringify(notes));
+}
+
+function toggleSet(key){
+  checked[key]=!checked[key];
+  if(checked[key]) showTimer();
+  save(); renderWorkout();
+}
+
+function resetDay(){
+  const p=`d${activeDay}_`;
+  Object.keys(checked).forEach(k=>{if(k.startsWith(p))delete checked[k];});
+  save(); renderWorkout();
+}
+
+function toggleSection(key){openSections[key]=!openSections[key];renderWorkout();}
+function toggleNote(k){openNotes[k]=!openNotes[k];renderWorkout();}
+function toggleLog(k){openLogs[k]=!openLogs[k];renderWorkout();}
+
+function saveNote(exName){
+  const id='n_'+btoa(unescape(encodeURIComponent(exName))).replace(/[^a-zA-Z0-9]/g,'');
+  const el=document.getElementById(id);
+  if(el){notes[exName]=el.value;save();}
+  openNotes[exName]=false;renderWorkout();
+}
+
+function saveLog(exName,sti){
+  const id='l_'+btoa(unescape(encodeURIComponent(exName+sti))).replace(/[^a-zA-Z0-9]/g,'');
+  const w=document.getElementById('w'+id)?.value;
+  const r=document.getElementById('r'+id)?.value;
+  if(!w&&!r)return;
+  if(!logs[exName])logs[exName]=[];
+  const today=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+  logs[exName].push({date:today,weight:w||'—',reps:r||'—',set:sti+1});
+  save(); openLogs[exName+sti]=false; renderWorkout();
+}
+
+function getDayProg(di){
+  const d=PLAN[di]; if(!d.sections) return {done:0,total:0};
+  let total=0,done=0;
+  d.sections.forEach((s,si)=>s.exercises.forEach((ex,ei)=>ex.sets.forEach((_,sti)=>{
+    total++; if(checked[`d${di}_s${si}_e${ei}_st${sti}`])done++;
+  })));
+  return {done,total};
+}
+
+// ── TIMER ─────────────────────────────────────────────────────────────────
+function showTimer(){document.getElementById('timerModal').style.display='flex';startTimer(timerTotal);}
+function closeTimer(){document.getElementById('timerModal').style.display='none';clearInterval(timerInterval);}
+function setTimerDur(s,btn){
+  timerTotal=s;
+  document.querySelectorAll('.timer-preset').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  startTimer(s);
+}
+function startTimer(s){
+  clearInterval(timerInterval); timerLeft=s; updateTimerUI();
+  timerInterval=setInterval(()=>{
+    timerLeft--;updateTimerUI();
+    if(timerLeft<=0){clearInterval(timerInterval);closeTimer();if('vibrate'in navigator)navigator.vibrate([200,100,200]);}
+  },1000);
+}
+function updateTimerUI(){
+  const circ=2*Math.PI*63;
+  document.getElementById('timerDisplay').textContent=timerLeft;
+  document.getElementById('timerRing').style.strokeDashoffset=circ*(1-timerLeft/timerTotal);
+  document.getElementById('timerRing').style.stroke=timerLeft<=10?'#FF4D4D':timerLeft<=20?'#F59E0B':'#2ECC71';
+}
+
+// ── GIF MODAL ─────────────────────────────────────────────────────────────
+function showGif(name){
+  const m=META[name];
+  document.getElementById('gifTitle').textContent=name;
+  document.getElementById('gifImg').innerHTML=m
+    ?`<img src="${m.gif}" alt="${name}" onerror="this.parentElement.innerHTML='<div style=padding:30px;color:#555;font-size:13px;line-height:1.6>Preview not available.<br/>Search <b style=color:#aaa>${name}</b> on YouTube!</div>'"/>`
+    :`<div style="padding:30px;color:#555;font-size:13px;line-height:1.6">Search <b style="color:#aaa">"${name} exercise form"</b> on YouTube for a great demo!</div>`;
+  document.getElementById('gifTipsWrap').innerHTML=m&&m.tips
+    ?`<div class="gif-tips-title">✅ Form Tips</div>`+m.tips.map(t=>`<div class="gif-tip-item"><span style="color:var(--green);flex-shrink:0">✓</span><span>${t}</span></div>`).join('')
+    :'';
+  document.getElementById('gifModal').style.display='flex';
+}
+function closeGif(){document.getElementById('gifModal').style.display='none';}
+
+// ── PAGE SWITCH ───────────────────────────────────────────────────────────
+function switchPage(page){
+  currentPage=page;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('nav-'+page).classList.add('active');
+  const hdr=document.getElementById('mainHeader');
+  const rb=document.getElementById('resetBtn');
+  if(page==='workout'){hdr.style.display='';rb.style.display='';renderTabs();renderWorkout();}
+  else{document.getElementById('tabs').innerHTML='';rb.style.display='none';}
+  if(page==='history')renderHistory();
+  if(page==='stats')renderStats();
+}
+
+// ── RENDER TABS ───────────────────────────────────────────────────────────
+function renderTabs(){
+  document.getElementById('tabs').innerHTML=PLAN.map((d,i)=>`
+    <button class="tab ${i===activeDay?'active':''}"
+      style="${i===activeDay?`border-bottom-color:${d.color};color:#fff`:''}"
+      onclick="activeDay=${i};openSections={};renderWorkout()">
+      <div class="tab-day" style="${i===activeDay?`color:${d.color}`:''}">${d.day.slice(0,3).toUpperCase()}</div>
+      ${d.label.replace(' 💥','⚡')}
+    </button>`).join('');
+}
+
+// ── RENDER WORKOUT ────────────────────────────────────────────────────────
+function renderWorkout(){
+  const d=PLAN[activeDay];
+  const {done,total}=getDayProg(activeDay);
+  const pct=total>0?Math.round((done/total)*100):0;
+  let h='';
+
+  // Hero
+  const heroStyle=d.isRest?'background:#1a1a1a;border:1px solid #272727':`background:${d.color}`;
+  h+=`<div class="day-hero" style="${heroStyle}">
+    <div class="day-hero-bg">${d.isRest?'😴':'💪'}</div>
+    <div class="day-hero-eyebrow">This Week</div>
+    <div class="day-hero-title">${d.label}</div>
+    <div class="day-hero-day">${d.day}</div>
+    <div class="day-hero-focus">${d.focus}</div>
+    ${d.note?`<div class="day-hero-note">💡 ${d.note}</div>`:''}
+  </div>`;
+
+  // Nutrition card
+  if(d.nutrition){
+    h+=`<div class="nutrition-card">
+      <div class="nutrition-title">🥗 Nutrition — ${d.nutrition.timing}</div>
+      ${d.nutrition.items.map(item=>`<div class="nutrition-row"><div class="nutrition-icon">${item.split(' ')[0]}</div><div>${item.substring(item.indexOf(' ')+1)}</div></div>`).join('')}
+    </div>`;
+  }
+
+  // Progress
+  if(!d.isRest&&total>0){
+    const allDone=done===total;
+    h+=`<div class="prog-wrap">
+      <div class="prog-label"><span>Today's Progress</span><span style="color:${allDone?'var(--green)':'#888'}">${done}/${total} sets · ${pct}%</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${d.color}"></div></div>
+      ${allDone?`<div class="prog-done">🎉 ${d.day} complete! You're an animal! 💪</div>`:''}
+    </div>`;
+  }
+
+  // Rest day
+  if(d.isRest){
+    h+=`<div class="rest-screen">
+      <div style="font-size:64px;margin-bottom:14px">😴</div>
+      <div style="font-size:20px;font-weight:800;color:#666;margin-bottom:6px">Rest & Rebuild</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">${d.day} is sacred. Don't skip rest.</div>
+    </div>
+    <div class="rest-tips"><div style="font-size:10px;font-weight:800;letter-spacing:2px;color:var(--sub);text-transform:uppercase;margin-bottom:10px">Today's Recovery Plan</div>
+    ${d.restTips.map(t=>`<div class="rest-tip-row"><span style="font-size:18px">${t.icon}</span><span>${t.text}</span></div>`).join('')}
+    </div>`;
+  }
+
+  // Sections
+  if(d.sections)d.sections.forEach((sec,si)=>{
+    const key=`sec_${activeDay}_${si}`;
+    const isOpen=openSections[key]!==false;
+    const isNew=sec.isNew;
+    let sDone=0,sTotal=0;
+    sec.exercises.forEach((ex,ei)=>ex.sets.forEach((_,sti)=>{
+      sTotal++;if(checked[`d${activeDay}_s${si}_e${ei}_st${sti}`])sDone++;
+    }));
+
+    h+=`<div class="section">
+      <button class="sec-hdr ${isOpen?'open':''}" onclick="toggleSection('${key}')">
+        <div class="sec-bar" style="background:${isNew?'var(--green)':d.isRest?'#555':d.color}"></div>
+        <span class="sec-name">${sec.name.replace(' · NEW','')}</span>
+        ${isNew?`<span class="sec-badge">NEW</span>`:''}
+        ${sTotal>0?`<span class="sec-cnt">${sDone}/${sTotal}</span>`:''}
+        <span class="chevron ${isOpen?'open':''}">▼</span>
+      </button>`;
+
+    if(isOpen){
+      h+=`<div class="exercises">`;
+      sec.exercises.forEach((ex,ei)=>{
+        const hasGif=!!META[ex.name];
+        const nk=ex.name;
+        const noteOpen=openNotes[nk];
+        const savedNote=notes[ex.name]||'';
+        const nid='n_'+btoa(unescape(encodeURIComponent(ex.name))).replace(/[^a-zA-Z0-9]/g,'');
+
+        h+=`<div class="exercise">
+          <div class="ex-header">
+            <div class="ex-name">${ex.name}</div>
+            ${hasGif?`<button class="gif-btn" onclick="showGif('${ex.name.replace(/'/g,"\\'").replace(/"/g,'\\"')}')">▶ Preview</button>`:''}
+          </div>`;
+
+        if(ex.tip)h+=`<div class="ex-tip tip-${ex.tipType||'warn'}">${ex.tip}</div>`;
+
+        h+=`<div class="set-list">`;
+        ex.sets.forEach((set,sti)=>{
+          const ck=`d${activeDay}_s${si}_e${ei}_st${sti}`;
+          const isDone=!!checked[ck];
+          const lid='l_'+btoa(unescape(encodeURIComponent(ex.name+sti))).replace(/[^a-zA-Z0-9]/g,'');
+          const logOpen=openLogs[ex.name+sti];
+          const isNoLog=ex.noLog;
+
+          h+=`<div>
+            <div class="set-row ${isDone?'done':''}" onclick="toggleSet('${ck}')">
+              <div class="set-check">${isDone?'✓':''}</div>
+              <div class="set-label">Set ${sti+1}</div>
+              <div class="set-info">${set.info}</div>
+              ${!isNoLog?`<button class="set-log-btn" onclick="event.stopPropagation();openLogs['${ex.name+sti}']=!openLogs['${ex.name+sti}'];renderWorkout()">📝</button>`:''}
+            </div>`;
+
+          if(logOpen&&!isNoLog)h+=`<div class="log-inputs">
+            <div class="log-field"><div class="log-label">Weight (kg)</div><input class="log-input" id="w${lid}" type="number" placeholder="e.g. 10" step="0.5"/></div>
+            <div class="log-field"><div class="log-label">Reps done</div><input class="log-input" id="r${lid}" type="number" placeholder="e.g. 15"/></div>
+            <button class="log-save-btn" onclick="saveLog('${ex.name.replace(/'/g,"\\'")}',${sti})">Save</button>
+          </div>`;
+
+          h+=`</div>`;
+        });
+        h+=`</div>`;
+
+        // Notes
+        h+=`<div class="notes-wrap">
+          <button class="notes-toggle" onclick="toggleNote('${ex.name.replace(/'/g,"\\'")}')">
+            📌 ${savedNote?'Note saved ✓':'Add note'} ${noteOpen?'▲':'▼'}
+          </button>
+          ${noteOpen?`<textarea class="notes-area" id="${nid}" placeholder="Form cues, how you felt, next week's goal...">${savedNote}</textarea>
+          <button class="notes-save" onclick="saveNote('${ex.name.replace(/'/g,"\\'")}')">Save Note</button>`:''}
+        </div>`;
+
+        h+=`</div>`;
+      });
+      h+=`</div>`;
+    }
+    h+=`</div>`;
+  });
+
+  // Week overview on Monday
+  if(activeDay===0){
+    h+=`<div class="week-card"><div class="week-ttl">Full Week at a Glance</div>`;
+    PLAN.forEach((wd,wi)=>{
+      const {done:wdone,total:wtotal}=getDayProg(wi);
+      const allDone=wdone===wtotal&&wtotal>0;
+      h+=`<div class="week-row" onclick="activeDay=${wi};openSections={};renderWorkout()">
+        <div class="week-dot" style="background:${wd.isRest?'#1a1a1a':`${wd.color}22`};border:1.5px solid ${wd.isRest?'#333':`${wd.color}44`};color:${wd.isRest?'#555':wd.color}">${wd.day.slice(0,3)}</div>
+        <div style="flex:1"><div class="week-name">${wd.label.replace(' 💥','')}</div><div class="week-focus">${wd.focus}</div></div>
+        ${wtotal>0?`<div class="week-prog" style="color:${allDone?'var(--green)':'#555'}">${allDone?'✓':wdone+'/'+wtotal}</div>`:''}
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  document.getElementById('page-workout').innerHTML=h;
+}
+
+// ── RENDER HISTORY ────────────────────────────────────────────────────────
+function renderHistory(){
+  const exNames=Object.keys(logs).filter(k=>logs[k].length>0);
+  let h=`<div class="hist-header">📈 Progress History</div>`;
+  if(exNames.length===0){
+    h+=`<div class="hist-empty"><div style="font-size:48px;margin-bottom:14px">📊</div><div style="font-weight:700;color:#555;margin-bottom:8px;font-size:16px">No logs yet</div><div>Tap 📝 on any set during your workout to start tracking your progress.</div></div>`;
+  } else {
+    exNames.forEach(exName=>{
+      const entries=logs[exName];
+      const last6=entries.slice(-6);
+      const weights=last6.map(e=>parseFloat(e.weight)||0);
+      const maxW=Math.max(...weights,1);
+      h+=`<div class="hist-ex-card"><div class="hist-ex-name">${exName}</div>`;
+      if(weights.some(w=>w>0)){
+        h+=`<div class="hist-chart">`;
+        last6.forEach((e,i)=>{
+          const bh=weights[i]>0?Math.max(8,(weights[i]/maxW)*60):4;
+          h+=`<div class="hist-bar-wrap">
+            <div class="hist-bar-val">${weights[i]>0?weights[i]+'kg':''}</div>
+            <div class="hist-bar" style="height:${bh}px;background:var(--green);opacity:${0.4+0.6*(i/Math.max(last6.length-1,1))}"></div>
+            <div class="hist-bar-date">${e.date}</div>
+          </div>`;
+        });
+        h+=`</div>`;
+      }
+      entries.slice(-6).reverse().forEach(e=>{
+        h+=`<div class="hist-log-row"><div><div style="font-weight:600">Set ${e.set}</div><div class="hist-log-date">${e.date}</div></div><div class="hist-log-val">${e.weight}kg × ${e.reps} reps</div></div>`;
+      });
+      h+=`</div>`;
+    });
+  }
+  document.getElementById('page-history').innerHTML=h;
+}
+
+// ── RENDER STATS ──────────────────────────────────────────────────────────
+function renderStats(){
+  const totalLogs=Object.values(logs).reduce((a,b)=>a+b.length,0);
+  const totalSets=Object.keys(checked).filter(k=>checked[k]).length;
+  const totalExs=Object.keys(logs).length;
+  const totalNotes=Object.keys(notes).filter(k=>notes[k]).length;
+
+  let h=`<div class="hist-header">⚡ Your Stats</div>
+  <div class="streak-card">
+    <div class="streak-num">${totalSets}</div>
+    <div><div class="streak-label" style="font-size:14px;font-weight:700;color:var(--gold)">🔥 Total Sets Done</div><div style="font-size:11px;color:#888;margin-top:2px">Keep pushing every day</div></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val" style="color:var(--blue)">${totalLogs}</div><div class="stat-label">Sets Logged</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--purple)">${totalExs}</div><div class="stat-label">Exercises Tracked</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--orange)">${totalNotes}</div><div class="stat-label">Notes Saved</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--pink)">78kg</div><div class="stat-label">Current Weight</div></div>
+  </div>`;
+
+  // Nutrition reminder
+  h+=`<div class="nutrition-card" style="margin-bottom:16px">
+    <div class="nutrition-title">🎯 Daily Targets — Hemanth</div>
+    <div class="nutrition-row"><div class="nutrition-icon">🥩</div><div>Protein: <b style="color:#fff">80–100g</b> per day</div></div>
+    <div class="nutrition-row"><div class="nutrition-icon">🔥</div><div>Calories: <b style="color:#fff">2,200–2,400</b> on workout days</div></div>
+    <div class="nutrition-row"><div class="nutrition-icon">💧</div><div>Water: <b style="color:#fff">3.5 litres</b> daily minimum</div></div>
+    <div class="nutrition-row"><div class="nutrition-icon">🌱</div><div>Chia drink every morning ✅</div></div>
+    <div class="nutrition-row"><div class="nutrition-icon">🏃</div><div>4km walk daily (gym commute) ✅</div></div>
+  </div>`;
+
+  // PRs
+  if(Object.keys(logs).length>0){
+    h+=`<div class="week-card"><div class="week-ttl">🏆 Personal Records</div>`;
+    Object.entries(logs).forEach(([ex,entries])=>{
+      const maxW=Math.max(...entries.map(e=>parseFloat(e.weight)||0));
+      const maxR=Math.max(...entries.map(e=>parseInt(e.reps)||0));
+      if(maxW>0||maxR>0){
+        h+=`<div class="hist-log-row"><div style="font-size:12px;font-weight:600;flex:1">${ex}</div><div class="hist-log-val">${maxW>0?maxW+'kg':''} ${maxR>0?'× '+maxR+' reps':''}</div></div>`;
+      }
+    });
+    h+=`</div>`;
+  }
+
+  // Face & body goals
+  h+=`<div class="week-card" style="margin-top:12px"><div class="week-ttl">🎯 Your Goals</div>
+    <div class="hist-log-row"><div style="font-size:12px;font-weight:600">Target Weight</div><div style="font-weight:700;color:var(--orange)">70–73 kg</div></div>
+    <div class="hist-log-row"><div style="font-size:12px;font-weight:600">Current BMI</div><div style="font-weight:700;color:var(--gold)">25.7 → target 22–24</div></div>
+    <div class="hist-log-row"><div style="font-size:12px;font-weight:600">Mewing</div><div style="font-weight:700;color:var(--green)">Daily habit ✓</div></div>
+    <div class="hist-log-row"><div style="font-size:12px;font-weight:600">Mastic Gum</div><div style="font-weight:700;color:var(--green)">20-30 mins daily ✓</div></div>
+    <div class="hist-log-row" style="border:none"><div style="font-size:12px;font-weight:600">Timeline</div><div style="font-weight:700;color:var(--purple)">8–12 weeks to visible change</div></div>
+  </div>`;
+
+  h+=`<div style="margin-top:16px;text-align:center">
+    <button onclick="if(confirm('Clear ALL workout data? This cannot be undone.')){logs={};notes={};checked={};save();renderStats();}"
+      style="background:#1a0a0a;border:1px solid #FF4D4D33;color:#FF4D4D;font-size:12px;font-weight:700;padding:10px 20px;border-radius:12px">
+      🗑 Clear All Data
+    </button>
+  </div>`;
+
+  document.getElementById('page-stats').innerHTML=h;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+renderTabs(); renderWorkout();
+</script>
+</body>
+</html>
